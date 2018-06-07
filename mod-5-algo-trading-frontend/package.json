@@ -1,0 +1,33 @@
+{
+  "name": "mod-5-algo-trading-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "ajv": "^6.5.0",
+    "babel-core": "^6.22.1",
+    "babel-loader": "^7.1.2",
+    "babel-preset-airbnb": "^2.1.1",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.22.0",
+    "babel-preset-stage-1": "^6.24.1",
+    "bignumber.js": "^7.2.1",
+    "gdax": "^0.8.0",
+    "gdax-trading-toolkit": "^0.3.1",
+    "jquery": "^3.1.1",
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0",
+    "react-router-dom": "^4.2.2",
+    "react-scripts": "1.1.4",
+    "react-websocket": "^2.0.0",
+    "semantic-ui-css": "^2.3.1",
+    "semantic-ui-react": "^0.81.1",
+    "socket.io": "^2.1.1",
+    "socket.io-client": "^2.1.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
