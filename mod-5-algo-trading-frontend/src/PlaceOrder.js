@@ -7,7 +7,26 @@ class PlaceOrder extends React.Component {
     orderType: 'market',
     buyOrSell: 'buy',
     limitPrice: 0,
-    quantity: 0
+    quantity: 0,
+    bestBid: 0,
+    bestAsk: 0
+  }
+
+  componentDidMount(){
+    setInterval(() => {
+      let buyArr = []
+      let sellArr = []
+      fetch(`https://api.gdax.com/products/${this.props.tradingPair}/book?level=1`)
+      .then(resp => resp.json())
+      .then(json => {
+        this.setState({
+          bestBid: json.bids[0][0],
+          bestAsk: json.asks[0][0]
+        })
+        console.log('best bid',this.state.bestBid)
+        console.log('best ask',this.state.bestAsk)
+      })
+    }, 1000)
   }
 
   handleChange = (e, { value }) => this.setState({ orderType: value })
@@ -27,6 +46,63 @@ class PlaceOrder extends React.Component {
       this.setState({
         quantity: e.target.value
       })
+    }
+  }
+
+  handleSubmitOrder = (e) => {
+    let cashValue = parseFloat(this.props.usdPosition.quantity)
+    let cryptoPurchaseValue = this.state.quantity * this.state.bestAsk
+    let cryptoSellValue = this.state.quantity * this.state.bestBid
+    let newCashQuantity = cashValue
+    let newCryptoQuantity = parseFloat(this.props.cryptoPosition.quantity)
+    let cryptoQuantityChange = parseFloat(this.state.quantity)
+    if(this.state.buyOrSell === 'buy') {
+      newCryptoQuantity = newCryptoQuantity + cryptoQuantityChange;
+      newCashQuantity = newCashQuantity - cryptoPurchaseValue
+      debugger
+    } else if(this.state.buyOrSell === 'sell') {
+      newCryptoQuantity = newCryptoQuantity - cryptoQuantityChange;
+      newCashQuantity = newCashQuantity + cryptoSellValue
+      debugger
+    }
+    debugger
+    if(this.state.orderType === 'market' && ((cashValue - cryptoPurchaseValue >= 0) || this.state.buyOrSell === 'sell')){
+      fetch(`http://localhost:3000/api/v1/positions/${this.props.cryptoPosition.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          "Accept": 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({
+          account_id: this.props.cryptoPosition.acciount_id,
+          quantity: newCryptoQuantity,
+          tradingPair: this.props.tradingPair
+        })
+      })
+      .then(resp => resp.json())
+      .then(json => {
+        fetch(`http://localhost:3000/api/v1/positions/${this.props.usdPosition.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            "Accept": 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
+          },
+          body: JSON.stringify({
+            account_id: this.props.cryptoPosition.acciount_id,
+            quantity: newCashQuantity,
+            tradingPair: this.props.tradingPair
+          })
+        })
+        .then(resp => resp.json())
+        .then(json => {
+          console.log(json)
+        })
+      })
+
+    } else if(this.state.orderType === 'limit'){
+
     }
   }
 
@@ -79,9 +155,15 @@ class PlaceOrder extends React.Component {
         }
         {
           this.state.buyOrSell === 'buy' ?
-          <p>Current Best Bid is </p>
+          <div>
+            <p>Current Best Bid is {this.state.bestBid}</p>
+            <Button onClick={this.handleSubmitOrder.bind(this)} inverted color='green'>Place Buy Order {this.props.tradingPair}</Button>
+          </div>
           :
-          <p>Current Best Offer is</p>
+          <div>
+            <p>Current Best Offer is {this.state.bestAsk}</p>
+            <Button onClick={this.handleSubmitOrder.bind(this)} inverted color='red'>Place Sell Order {this.props.tradingPair}</Button>
+          </div>
         }
       </Form>
       </div>

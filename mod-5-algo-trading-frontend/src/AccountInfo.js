@@ -9,7 +9,11 @@ class AccountInfo extends React.Component {
     super(props)
     this.state = {
       account: props.account,
-      positions: {}
+      usdPosition: {},
+      btcPosition: {},
+      ethPosition: {},
+      bchPosition: {},
+      ltcPosition: {}
     }
   }
 
@@ -24,23 +28,33 @@ class AccountInfo extends React.Component {
       withCredentials: true
     })
       .then(resp => resp.json())
-      .then(json => {this.setState({
-        positions: json
-      })})
+      .then(json => {
+        json.forEach(position => {
+          let symbol = position.trading_pair.substring(0,3).toLowerCase()
+          this.setState({
+            [`${symbol}Position`]: position
+          })
+        })
+      })
   }
 
   render() {
-    console.log(this.state.account)
+    console.log('cheicking full state', this.state)
     console.log(this.state.positions)
-    let usd = 0
-    let btc = 0
+    let usd = this.state.usdPosition.quantity
+    let btc = this.state.btcPosition.quantity
+
+    let cryptoPosition = this.state[`${this.props.tradingPair.substring(0,3).toLowerCase()}Position`]
     return (
       <div>
         <h5>Welcome: {this.props.account.username}</h5>
-        <h5>{this.props.account.email}</h5>
-        <h5>Cash (USD): 0</h5>
+        <h5>Cash (USD): {usd}</h5>
+        <p>BTC: {this.state.btcPosition.quantity}</p>
+        <p>ETH: {this.state.ethPosition.quantity}</p>
+        <p>LTC: {this.state.ltcPosition.quantity}</p>
+        <p>BCH: {this.state.bchPosition.quantity}</p>
         <DropDown setTradingPair={this.props.setTradingPair}/>
-        <PlaceOrder tradingPair={this.props.tradingPair}/>
+        <PlaceOrder tradingPair={this.props.tradingPair} usdPosition={this.state.usdPosition} cryptoPosition={cryptoPosition}/>
       </div>
     )
   }
