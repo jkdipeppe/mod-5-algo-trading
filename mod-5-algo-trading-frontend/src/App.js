@@ -6,6 +6,7 @@ import "./App.css";
 import "./App.css";
 import Login from "./Login";
 import AccountContainer from "./AccountContainer";
+import CreateAccount from "./CreateAccount";
 
 // import GdaxTradingPlatform from "./GdaxTradingPlatform";
 
@@ -55,7 +56,10 @@ class App extends Component {
           {this.state.loggedIn ? (
             <Route path='/display' render={() => <AccountContainer/>} />
           ) : (
-            <Route path='/login' render={(props) => <Login handleRoute={this.handleRoute} handleLogIn={this.handleLogIn}/>} />
+            <div>
+              <Route path='/login' render={(props) => <Login handleRoute={this.handleRoute} handleLogIn={this.handleLogIn}/>} />
+              <Route path='/createAccount' render={(props) => <CreateAccount handleLogIn={this.handleLogIn}/>} />
+            </div>
           )}
         </div>
       </Router>

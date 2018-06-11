@@ -16,7 +16,11 @@ let subscribe = JSON.stringify(
     "type": "subscribe",
     "product_ids": [
       "ETH-USD",
-      "BTC-USD"
+      "BTC-USD",
+      "BCH-USD",
+      "LTC-USD",
+      "BTC-EUR",
+      "BCH-EUR"
     ],
     "channels": [
       "ticker",
@@ -24,7 +28,11 @@ let subscribe = JSON.stringify(
         "name": "ticker",
         "product_ids": [
           "ETH-USD",
-          "BTC-USD"
+          "BTC-USD",
+          "BCH-USD",
+          "LTC-USD",
+          "BTC-EUR",
+          "BCH-EUR"
         ]
       }
     ]
@@ -33,34 +41,46 @@ let subscribe = JSON.stringify(
 
 // console.log('props', this.props)
 class ExecutedTrades extends React.Component {
-  state = {
-    trades: [],
+  constructor(props){
+    super(props)
+
+    this.state={
+      trades: [],
+      tradingPair: this.props.tradingPair
+    }
+  }
+  // state = {
+  //   trades: [],
+  // }
+
+  componentShouldUpdate(nextProps, nextState){
+    return this.state.value !== this.props.tradingPair
   }
   componentDidMount(){
+    this.setState({
+      trades: []
+    })
 
   this.connection = new WebSocket('wss://ws-feed.gdax.com');
+  this.connection.onopen = () => this.connection.send(subscribe)
     // listen to onmessage event
-    setInterval( _ => {
     this.connection.onmessage = evt => {
       // add the new message to state
       let currResp = JSON.parse(evt.data);
-      // console.log('curr Response', currResp)
-        if(currResp.product_id === this.props.tradingPair && this.state.trades.length >= 20){
+        if(currResp.product_id === this.props.tradingPair && this.state.trades.length >= 20 && currResp.type !== 'ticker'){
           let arr = [...this.state.trades]
           arr.splice(0,1)
           this.setState({
             trades: [...arr, currResp]
           })
-        } else if(currResp.product_id === this.props.tradingPair){
+        } else if(currResp.product_id === this.props.tradingPair && currResp.type === 'ticker'){
           this.setState({
             trades: [...this.state.trades, currResp]
           })
         }
     }
-  }, 2000)
 
     // this will subscribe to a connection for the subscribe's pair prices
-      this.connection.onopen = () => this.connection.send(subscribe)
     }
   // componentDidMount(){
   //   this.interval = setInterval(() =>
@@ -88,24 +108,31 @@ class ExecutedTrades extends React.Component {
 
   render(){
     let arr = [...this.state.trades]
+    let lastPrice = 0;
 
     return(
       <div>
-        <p>Executed Trades</p>
+        <p>Executed Trades for {this.props.tradingPair}</p>
         <div>
           {
             arr.reverse().map(trade => {
-              let price = parseFloat(trade.price).toFixed(2)
-              let time = trade.time.split('').splice(11,8).join('')
-              let hour = ((parseInt(time.split('').splice(0,2).join('')) + 20) % 24).toString()
-              let size = parseFloat(trade.last_size).toFixed(4)
-              // console.log(typeof hour)
-              time = hour.concat(time.split('').splice(2).join(''))
-              return(
-                <p style={{fontSize: 7}}>
-                  {"Size: " + size + "    Price: " + price + "    Time: " + time}
-                </p>
-              )
+
+              if(trade.time){
+                console.log('lastPrice', lastPrice)
+                let price = parseFloat(trade.price).toFixed(2)
+                console.log('price', price)
+                let size = parseFloat(trade.last_size).toFixed(4)
+                let time = trade.time.split('').splice(11,8).join('')
+                let hour = ((parseInt(time.split('').splice(0,2).join('')) + 20) % 24).toString()
+                time = hour.concat(time.split('').splice(2).join(''))
+                let color = (price >= lastPrice) ? 'green' : 'red'
+                lastPrice = price
+                return(
+                  <p style={{fontSize: 7, color: color}}>
+                    {"Size: " + size + "    Price: " + price + "Time: " + time}
+                  </p>
+                )
+              }
             })
           }
         </div>
@@ -116,17 +143,3 @@ class ExecutedTrades extends React.Component {
 }
 
 export default ExecutedTrades
-
-
-//
-// const websocket = new Gdax.WebsocketClient(['BTC-USD', 'ETH-USD'],  'wss://ws-feed-public.sandbox.gdax.com');
-//
-// websocket.on('message', data => {
-//   /* work with data */
-// });
-// websocket.on('error', err => {
-//   /* handle error */
-// });
-// websocket.on('close', () => {
-//   /* ... */
-// });

@@ -28,14 +28,28 @@ class AccountContainer extends React.Component {
       .then(json => this.setState({ account: json }));
   }
 
+  setTradingPair = (e) => {
+    let crypto = e.target.innerText.substring(0,3)
+    let currency = e.target.innerText.substring(e.target.innerText.length - 3)
+    let newPair = crypto + "-" + currency
+    // debugger
+    this.setState({
+      tradingPair: newPair
+    })
+
+  }
+
   render() {
-    console.log(this.state.account)
+    console.log(this.state.tradingPair)
+    if(this.state.account){
+      console.log('current account', this.state.account.positions)
+    }
       return (
         <Grid celled>
           <Grid.Row>
             <Grid.Column width={3}>
               {this.state.account ? (
-                <AccountInfo account={this.state.account}/>
+                <AccountInfo tradingPair={this.state.tradingPair} setTradingPair={this.setTradingPair} account={this.state.account}/>
               ) : (
                 <p>Loading...</p>
               )}
@@ -52,7 +66,7 @@ class AccountContainer extends React.Component {
 
                 </Segment>
                 <Segment height={8}>
-                  <BidAsk />
+                  <BidAsk tradingPair={this.state.tradingPair}/>
                 </Segment>
 
             </Grid.Column>
