@@ -1,6 +1,7 @@
 import React from 'react'
 import { Grid, Form, Checkbox, Button, Input } from 'semantic-ui-react'
 
+const baseUrl = "http://localhost:3000";
 
 class CreateAccount extends React.Component {
   state = {
@@ -19,7 +20,6 @@ class CreateAccount extends React.Component {
 
   handleSubmit = (props) => {
     if(this.state.username !== '' && this.state.password !== '' && this.state.email.includes('@')){
-      debugger
       fetch('http://localhost:3000/api/v1/accounts', {
         method: 'POST',
         headers: {
@@ -34,17 +34,28 @@ class CreateAccount extends React.Component {
       })
       .then(resp => resp.json())
       .then(json => {
-        debugger
-        if(json.token) {
-          localStorage.setItem("token", json.token);
-          props.handleLogIn()
-        }
+        fetch(`${baseUrl}/login`, {
+          method: "POST",
+          body: JSON.stringify(this.state),
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          }
+        })
+          .then(res =>
+            res.json())
+          .then(json => {
+            if(json.token) {
+              localStorage.setItem("token", json.token);
+              this.props.handleLogIn()
+            }
+          })
       })
     }
   }
 
   render(){
-    console.log(this.state)
+
     return(
       <Grid>
         <Grid.Row>

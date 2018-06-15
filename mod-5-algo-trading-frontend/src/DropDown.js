@@ -6,8 +6,7 @@ let tradingPairs = [
   { key: 'BCH-USD', value: 'BCH-USD', text: 'BCH - Bitcoin Cash/USD' },
   { key: 'ETH-USD', value: 'ETH-USD', text: 'ETH - Ethereum/USD' },
   { key: 'LTC-USD', value: 'LTC-USD', text: 'LTC - Litecoin/USD' },
-  { key: 'BTC-EUR', value: 'BTC-EUR', text: 'BTC - Bitcoin/EUR' },
-  { key: 'ETH-EUR', value: 'ETH-EUR', text: 'BTC - Bitcoin/EUR' },
+
 ]
 
 class DropDown extends React.Component{
@@ -19,7 +18,9 @@ class DropDown extends React.Component{
 
   render(){
     return(
-      <Dropdown placeholder='Select Trading Pair' search selection options={tradingPairs} onChange={this.handleTradingPair.bind(this)} />
+      <div style={{padding:'10px', width: '80%'}}>
+        <Dropdown size='mini' style={{width:'80%'}} placeholder='Select Trading Pair' search selection options={tradingPairs} onChange={this.handleTradingPair.bind(this)} />
+      </div>
     )
   }
 }

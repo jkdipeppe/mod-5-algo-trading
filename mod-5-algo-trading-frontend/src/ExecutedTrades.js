@@ -1,15 +1,4 @@
-import * as GTT from 'gdax-trading-toolkit';
 import React from 'react'
-import openSocket from 'socket.io-client';
-
-// import { GDAXFeed } from "gdax-trading-toolkit/build/src/exchanges";
-
-// const logger = GTT.utils.ConsoleLoggerFactory();
-// const products: string[] = ['BTC-USD', 'ETH-USD', 'LTC-USD'];
-// // debugger
-// GTT.Factories.GDAX.FeedFactory(logger, products).then((feed: GDAXFeed) => {
-//     console.log(feed)
-// });
 
 let subscribe = JSON.stringify(
   {
@@ -19,8 +8,6 @@ let subscribe = JSON.stringify(
       "BTC-USD",
       "BCH-USD",
       "LTC-USD",
-      "BTC-EUR",
-      "BCH-EUR"
     ],
     "channels": [
       "ticker",
@@ -31,112 +18,119 @@ let subscribe = JSON.stringify(
           "BTC-USD",
           "BCH-USD",
           "LTC-USD",
-          "BTC-EUR",
-          "BCH-EUR"
         ]
       }
     ]
   }
 )
 
-// console.log('props', this.props)
 class ExecutedTrades extends React.Component {
   constructor(props){
     super(props)
 
     this.state={
       trades: [],
-      tradingPair: this.props.tradingPair
+      tradingPair: this.props.tradingPair,
+      visibleTrades: 40
     }
   }
-  // state = {
-  //   trades: [],
-  // }
 
-  componentShouldUpdate(nextProps, nextState){
-    return this.state.value !== this.props.tradingPair
-  }
   componentDidMount(){
-    this.setState({
-      trades: []
-    })
-
-  this.connection = new WebSocket('wss://ws-feed.gdax.com');
-  this.connection.onopen = () => this.connection.send(subscribe)
-    // listen to onmessage event
+    fetch(`https://api.gdax.com/products/${this.props.tradingPair}/trades`)
+     .then(resp => resp.json())
+     .then(json => {
+       json.map(trade => {
+         return(
+           this.setState({
+             trades: [...this.state.trades, trade]
+           })
+         )
+       })
+       this.setState({
+         trades: [...this.state.trades.splice(0,this.state.visibleTrades)]
+       })
+     })
+    this.connection = new WebSocket('wss://ws-feed.gdax.com');
+    this.connection.onopen = () => this.connection.send(subscribe)
+      // listen to onmessage event
     this.connection.onmessage = evt => {
       // add the new message to state
       let currResp = JSON.parse(evt.data);
-        if(currResp.product_id === this.props.tradingPair && this.state.trades.length >= 20 && currResp.type !== 'ticker'){
+      if(currResp.product_id === this.props.tradingPair && this.state.trades.length >= this.state.visibleTrades && currResp.type !== 'ticker'){
+        let arr = [...this.state.trades]
+        arr.splice(-1,1)
+        this.setState({
+          trades: [currResp, ...arr]
+        })
+      } else if(currResp.product_id === this.props.tradingPair && currResp.type === 'ticker'){
+        if(this.state.trades.length >= this.state.visibleTrades){
           let arr = [...this.state.trades]
-          arr.splice(0,1)
+          arr.splice(-1,1)
           this.setState({
-            trades: [...arr, currResp]
+            trades: [currResp, ...arr]
           })
-        } else if(currResp.product_id === this.props.tradingPair && currResp.type === 'ticker'){
+        } else {
           this.setState({
-            trades: [...this.state.trades, currResp]
+            trades: [currResp, ...this.state.trades]
           })
         }
+      }
     }
+  }
 
-    // this will subscribe to a connection for the subscribe's pair prices
+  componentDidUpdate(prevProps){
+    if(prevProps.tradingPair !== this.props.tradingPair) {
+      this.setState({
+        trades: []
+      })
+
+      fetch(`https://api.gdax.com/products/${this.props.tradingPair}/trades`)
+       .then(resp => resp.json())
+       .then(json => {
+         json.map(trade => {
+           return(
+             this.setState({
+               trades: [...this.state.trades, trade]
+             })
+           )
+         })
+         this.setState({
+           trades: [...this.state.trades.splice(0,this.state.visibleTrades)]
+         })
+       })
     }
-  // componentDidMount(){
-  //   this.interval = setInterval(() =>
-  //     fetch(`https://api.gdax.com/products/${this.props.tradingPair}/trades`)
-  //       .then(resp => resp.json())
-  //       .then(json => {
-  //         console.log('setting state in CDM')
-  //         this.setState({
-  //           trades: json.splice(0,10)
-  //         })
-  //       }), 1000
-  //   )
-  // }
-  // componentDidMount() {
-  // this.interval = setInterval(() => this.setState({ time: Date.now() }), 1000);
-  // }
-  // componentWillUnmount() {
-  //   clearInterval(this.interval);
-  // }
-
-
-  // componentWillUnmount(){
-  //   this.connection.close();
-  // }
+  }
 
   render(){
     let arr = [...this.state.trades]
-    let lastPrice = 0;
 
     return(
       <div>
         <p>Executed Trades for {this.props.tradingPair}</p>
         <div>
           {
-            arr.reverse().map(trade => {
-
+            arr.map(trade => {
               if(trade.time){
-                console.log('lastPrice', lastPrice)
                 let price = parseFloat(trade.price).toFixed(2)
-                console.log('price', price)
                 let size = parseFloat(trade.last_size).toFixed(4)
+                if(trade.size){
+                  size = parseFloat(trade.size).toFixed(4)
+                }
                 let time = trade.time.split('').splice(11,8).join('')
-                let hour = ((parseInt(time.split('').splice(0,2).join('')) + 20) % 24).toString()
+                let hour = ((parseInt(time.split('').splice(0,2).join(''), 10) + 20) % 24).toString()
                 time = hour.concat(time.split('').splice(2).join(''))
-                let color = (price >= lastPrice) ? 'green' : 'red'
-                lastPrice = price
+                let color = (trade.side === 'buy') ? 'green' : 'red'
                 return(
-                  <p style={{fontSize: 7, color: color}}>
-                    {"Size: " + size + "    Price: " + price + "Time: " + time}
+                  <p key={trade.trade_id} style={{fontSize: 15, color: color}}>
+                    {"S: " + size + " P: " + price + " T: " + time}
                   </p>
                 )
+              } else {
+                return(null)
               }
             })
           }
         </div>
-
       </div>
     )
   }

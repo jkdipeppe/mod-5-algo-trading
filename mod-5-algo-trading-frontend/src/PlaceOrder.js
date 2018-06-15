@@ -9,22 +9,24 @@ class PlaceOrder extends React.Component {
     limitPrice: 0,
     quantity: 0,
     bestBid: 0,
-    bestAsk: 0
+    bestAsk: 0,
+    insufficientFunds: false,
+    orderSuccessful: false
   }
 
   componentDidMount(){
     setInterval(() => {
-      let buyArr = []
-      let sellArr = []
       fetch(`https://api.gdax.com/products/${this.props.tradingPair}/book?level=1`)
       .then(resp => resp.json())
       .then(json => {
-        this.setState({
-          bestBid: json.bids[0][0],
-          bestAsk: json.asks[0][0]
-        })
-        console.log('best bid',this.state.bestBid)
-        console.log('best ask',this.state.bestAsk)
+        if(json.bids && json.asks){
+          this.setState({
+            bestBid: json.bids[0][0],
+            bestAsk: json.asks[0][0]
+          })
+        } else {
+          null
+        }
       })
     }, 1000)
   }
@@ -59,14 +61,12 @@ class PlaceOrder extends React.Component {
     if(this.state.buyOrSell === 'buy') {
       newCryptoQuantity = newCryptoQuantity + cryptoQuantityChange;
       newCashQuantity = newCashQuantity - cryptoPurchaseValue
-      debugger
     } else if(this.state.buyOrSell === 'sell') {
       newCryptoQuantity = newCryptoQuantity - cryptoQuantityChange;
       newCashQuantity = newCashQuantity + cryptoSellValue
-      debugger
     }
-    debugger
-    if(this.state.orderType === 'market' && ((cashValue - cryptoPurchaseValue >= 0) || this.state.buyOrSell === 'sell')){
+
+    if(this.state.orderType === 'market' && ((cashValue - cryptoPurchaseValue >= 0) || (this.state.buyOrSell === 'sell' && newCryptoQuantity >=0))){
       fetch(`http://localhost:3000/api/v1/positions/${this.props.cryptoPosition.id}`, {
         method: 'PUT',
         headers: {
@@ -82,6 +82,7 @@ class PlaceOrder extends React.Component {
       })
       .then(resp => resp.json())
       .then(json => {
+        console.log('first fetch json', json)
         fetch(`http://localhost:3000/api/v1/positions/${this.props.usdPosition.id}`, {
           method: 'PUT',
           headers: {
@@ -97,28 +98,85 @@ class PlaceOrder extends React.Component {
         })
         .then(resp => resp.json())
         .then(json => {
-          console.log(json)
+          console.log('handling order next')
+          this.props.handleOrder()
+          this.handleOrderSuccess()
         })
       })
 
     } else if(this.state.orderType === 'limit'){
+      if(this.state.quantity * this.state.bestAsk <= this.props.usdPosition.quantity){
+        fetch(`http://localhost:3000/api/v1/orders`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            "Accept": 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
+          },
+          body: JSON.stringify({
+            account_id: this.props.usdPosition.account_id,
+            quantity: this.state.quantity,
+            trading_pair: this.props.tradingPair,
+            price: this.state.limitPrice,
+            limit: true,
+            usd_id: this.props.usdPosition.id,
+            position_id: this.props.cryptoPosition.id,
+            buy_or_sell: this.state.buyOrSell
+          })
+        })
+        .then(resp => resp.json)
+        .then(json => {
+          this.setState({
+            quantity:0,
+            limitPrice: 0
+          })
+          console.log('the json from order placement',json)})
+        }
+      } else {
+        this.handleOrderFail()
+      }
+  }
 
-    }
+  handleOrderSuccess = () => {
+    this.setState({
+      orderSuccessful: true,
+      quantity: 0,
+      orderType: 'market',
+      limitPrice: 0
+    })
+    setTimeout(() => {
+      this.setState({
+        orderSuccessful: false
+      })
+    }, 3000)
+  }
+
+  handleOrderFail = () => {
+    this.setState({
+      insufficientFunds: true,
+      orderType: 'market',
+    })
+    setTimeout(() => {
+      this.setState({
+        insufficientFunds: false
+      })
+    }, 3000)
   }
 
   render() {
     return(
       <div>
-        <Form.Field>
+        <h5>Current trading pair: {this.props.tradingPair}</h5>
+        <Form.Field style={{padding:10}}>
           <Button.Group >
             <Button
               value='buy'
-              color={this.state.buyOrSell === 'buy' ? 'green' : 'gray'}
+              color={this.state.buyOrSell === 'buy' ? 'green' : 'grey'}
               onClick={this.handleBidAsk}
             >Buy</Button>
             <Button
               value='sell'
-              color={this.state.buyOrSell === 'sell' ? 'red' : 'gray'}
+              color={this.state.buyOrSell === 'sell' ? 'red' : 'grey'}
               onClick={this.handleBidAsk}
             >Sell</Button>
           </Button.Group>
@@ -130,6 +188,7 @@ class PlaceOrder extends React.Component {
             </Form.Group>
           <Form.Field>
             <Radio
+              style={{padding:5}}
               label='Market'
               name='radioGroup'
               value='market'
@@ -166,6 +225,18 @@ class PlaceOrder extends React.Component {
           </div>
         }
       </Form>
+      {
+        this.state.orderSuccessful ?
+        <h5 style={{color:'blue'}}>Order Successful!</h5>
+        :
+        null
+      }
+      {
+        this.state.insufficientFunds ?
+        <h5 style={{color:'red'}}>Could not complete order - check available funds or position size</h5>
+        :
+        null
+      }
       </div>
     )
   }
