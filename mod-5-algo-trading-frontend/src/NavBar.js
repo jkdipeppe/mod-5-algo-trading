@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Menu, Search } from 'semantic-ui-react'
-import _ from 'lodash'
+import { Menu } from 'semantic-ui-react'
+// import _ from 'lodash'
 
 class NavBar extends React.Component{
   state = {
@@ -24,10 +24,10 @@ class NavBar extends React.Component{
               </Menu.Item>
               <Menu.Item>
                 <NavLink
-                  to="/trading"
+                  to="/limitOrders"
                   exact
                   activeStyle={{background: 'lightgray'}}
-                  >Indexes
+                  >View Pending Limit Orders
                 </NavLink>
               </Menu.Item>
               <Menu.Item>
@@ -52,7 +52,7 @@ class NavBar extends React.Component{
             </Menu.Item>
             <Menu.Item>
               <NavLink
-                to="/createaccount"
+                to="/CreateAccount"
                 exact
                 activeStyle={{background: 'lightgray'}}
                 >Create Account

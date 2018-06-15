@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 import NavBar from './NavBar';
 import logo from "./logo.svg";
 import "./App.css";
@@ -7,8 +7,7 @@ import "./App.css";
 import Login from "./Login";
 import AccountContainer from "./AccountContainer";
 import CreateAccount from "./CreateAccount";
-
-// import GdaxTradingPlatform from "./GdaxTradingPlatform";
+import PendingOrderContainer from "./PendingOrderContainer";
 
 class App extends Component {
   constructor(){
@@ -22,7 +21,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    localStorage.getItem("token") ? this.setState({loggedIn: true}) : null
+    localStorage.getItem("token") ? this.setState({loggedIn: true}) : this.setState({loggedIn: false})
   }
 
   handleLogIn = () => {
@@ -43,8 +42,7 @@ class App extends Component {
   }
 
   render() {
-    console.log(localStorage);
-    console.log('logged in?', this.state.loggedIn)
+
     return (
       <Router>
         <div className="App">
@@ -54,11 +52,16 @@ class App extends Component {
           </header>
           <NavBar loggedIn={this.state.loggedIn} handleLogOut={()=> this.handleLogOut()}/>
           {this.state.loggedIn ? (
-            <Route path='/display' render={() => <AccountContainer/>} />
+            <div>
+              <Redirect to='/display' />
+              <Route path='/display' render={() => <AccountContainer />} />
+              <Route path='/limitOrders' render={() => <PendingOrderContainer />} />
+
+            </div>
           ) : (
             <div>
-              <Route path='/login' render={(props) => <Login handleRoute={this.handleRoute} handleLogIn={this.handleLogIn}/>} />
-              <Route path='/createAccount' render={(props) => <CreateAccount handleLogIn={this.handleLogIn}/>} />
+              <Route path='/login' render={(props) => <Login loggedIn={this.state.loggedIn} handleRoute={this.handleRoute} handleLogIn={this.handleLogIn}/>} />
+              <Route path='/CreateAccount' render={(props) => <CreateAccount loggedIn={this.state.loggedIn} handleLogIn={this.handleLogIn}/>} />
             </div>
           )}
         </div>

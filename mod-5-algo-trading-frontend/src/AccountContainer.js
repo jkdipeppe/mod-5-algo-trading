@@ -1,10 +1,9 @@
 import React from "react";
-import GdaxData from "./GdaxData";
-// import TickerTape from "./TickerTape";
 import ExecutedTrades from "./ExecutedTrades";
 import AccountInfo from "./AccountInfo";
+import LineChart from "./LineChart";
 import BidAsk from "./BidAsk";
-import { Menu, Grid, Segment } from 'semantic-ui-react'
+import { Grid, Segment } from 'semantic-ui-react'
 
 
 const baseUrl = "http://localhost:3000";
@@ -12,7 +11,7 @@ const baseUrl = "http://localhost:3000";
 class AccountContainer extends React.Component {
   state = {
     account: null,
-    tradingPair: 'BTC-USD'
+    tradingPair: 'BTC-USD',
   };
 
   componentDidMount() {
@@ -26,23 +25,32 @@ class AccountContainer extends React.Component {
     })
       .then(res => res.json())
       .then(json => this.setState({ account: json }));
+
   }
 
   setTradingPair = (e) => {
     let crypto = e.target.innerText.substring(0,3)
     let currency = e.target.innerText.substring(e.target.innerText.length - 3)
     let newPair = crypto + "-" + currency
-    // debugger
     this.setState({
-      tradingPair: newPair
+      chartPrices: []
     })
-
+    fetch(`https://min-api.cryptocompare.com/data/histoday?fsym=${newPair.substring(0,3)}&tsym=USD&limit=30`)
+    .then(resp => resp.json())
+    .then(json => {
+      json.Data.map(trade => {
+        return(
+          this.setState({
+            tradingPair: newPair,
+            chartPrices: [...this.state.chartPrices, trade.close]
+          })
+        )
+      })
+    })
   }
 
   render() {
-    console.log(this.state.tradingPair)
     if(this.state.account){
-      console.log('current account', this.state.account.positions)
     }
       return (
         <Grid celled>
@@ -58,11 +66,7 @@ class AccountContainer extends React.Component {
             <Grid.Column width={10}>
 
                 <Segment width={8}>
-                  <h3>Chart</h3>
-                  <h3>Chart</h3>
-                  <h3>Chart</h3>
-                  <h3>Chart</h3>
-                  <h3>Chart</h3>
+                  <LineChart tradingPair={this.state.tradingPair} chartPrices={this.state.chartPrices}/>
 
                 </Segment>
                 <Segment height={8}>
