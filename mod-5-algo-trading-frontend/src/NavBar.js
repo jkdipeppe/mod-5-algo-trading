@@ -19,7 +19,7 @@ class NavBar extends React.Component{
                   to="/display"
                   exact
                   activeStyle={{background: 'lightgray'}}
-                  >Overview
+                  >Trading/Markets
                 </NavLink>
               </Menu.Item>
               <Menu.Item>
@@ -27,7 +27,7 @@ class NavBar extends React.Component{
                   to="/limitOrders"
                   exact
                   activeStyle={{background: 'lightgray'}}
-                  >View Pending Limit Orders
+                  >Account Stats
                 </NavLink>
               </Menu.Item>
               <Menu.Item>

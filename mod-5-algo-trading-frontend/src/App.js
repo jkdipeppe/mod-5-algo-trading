@@ -7,7 +7,7 @@ import "./App.css";
 import Login from "./Login";
 import AccountContainer from "./AccountContainer";
 import CreateAccount from "./CreateAccount";
-import PendingOrderContainer from "./PendingOrderContainer";
+import AccountStats from "./AccountStats";
 
 class App extends Component {
   constructor(){
@@ -47,15 +47,14 @@ class App extends Component {
       <Router>
         <div className="App">
           <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <h1 className="App-title">Welcome to Crypto Trader</h1>
+            <h1 className="App-title">Crypto Trader</h1>
           </header>
           <NavBar loggedIn={this.state.loggedIn} handleLogOut={()=> this.handleLogOut()}/>
           {this.state.loggedIn ? (
             <div>
               <Redirect to='/display' />
               <Route path='/display' render={() => <AccountContainer />} />
-              <Route path='/limitOrders' render={() => <PendingOrderContainer />} />
+              <Route path='/limitOrders' render={() => <AccountStats />} />
 
             </div>
           ) : (

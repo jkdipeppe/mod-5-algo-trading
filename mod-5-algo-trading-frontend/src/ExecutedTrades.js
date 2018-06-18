@@ -87,6 +87,7 @@ class ExecutedTrades extends React.Component {
       fetch(`https://api.gdax.com/products/${this.props.tradingPair}/trades`)
        .then(resp => resp.json())
        .then(json => {
+         if(json){
          json.map(trade => {
            return(
              this.setState({
@@ -97,7 +98,7 @@ class ExecutedTrades extends React.Component {
          this.setState({
            trades: [...this.state.trades.splice(0,this.state.visibleTrades)]
          })
-       })
+       }})
     }
   }
 

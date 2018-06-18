@@ -91,6 +91,28 @@ class AccountInfo extends React.Component {
           depositBox: false
         })
       })
+
+      let totalAccountDeposits = parseInt(this.state.account.cash_deposited) + parseInt(this.state.depositAmount)
+      console.log(totalAccountDeposits)
+      console.log('account ID',this.state.account.id)
+      console.log('account',this.state.account)
+
+      fetch(`http://localhost:3000/api/v1/accounts/${this.state.account.id}`, {
+        method: 'PATCH',
+        headers: new Headers({
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          'Authorization': `Bearer ${localStorage.getItem("token")}`
+        }),
+        withCredentials: true,
+        body: JSON.stringify({
+          cash_deposited: totalAccountDeposits
+        })
+      })
+        .then(resp => resp.json())
+        .then(json => {
+          console.log('json for updated deposited total', json)
+        })
   }
 
   handleDepositAmount = (e) => {

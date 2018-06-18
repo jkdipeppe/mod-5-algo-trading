@@ -29,7 +29,8 @@ class CreateAccount extends React.Component {
         body: JSON.stringify({
           username: this.state.username,
           password: this.state.password,
-          email: this.state.email
+          email: this.state.email,
+          cash_deposited: 0
         })
       })
       .then(resp => resp.json())

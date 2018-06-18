@@ -62,11 +62,15 @@ class PlaceOrder extends React.Component {
       newCryptoQuantity = newCryptoQuantity + cryptoQuantityChange;
       newCashQuantity = newCashQuantity - cryptoPurchaseValue
     } else if(this.state.buyOrSell === 'sell') {
+      console.log('its a sell')
       newCryptoQuantity = newCryptoQuantity - cryptoQuantityChange;
       newCashQuantity = newCashQuantity + cryptoSellValue
+      console.log(newCryptoQuantity)
     }
-
-    if(this.state.orderType === 'market' && ((cashValue - cryptoPurchaseValue >= 0) || (this.state.buyOrSell === 'sell' && newCryptoQuantity >=0))){
+    console.log(newCryptoQuantity)
+    console.log('true or tfalse', newCryptoQuantity >= 0.00)
+    if(this.state.orderType === 'market' && ((cashValue - cryptoPurchaseValue >= 0) || (this.state.buyOrSell === 'sell')) && newCryptoQuantity >= 0){
+        console.log('inside the if')
       fetch(`http://localhost:3000/api/v1/positions/${this.props.cryptoPosition.id}`, {
         method: 'PUT',
         headers: {
@@ -106,6 +110,7 @@ class PlaceOrder extends React.Component {
 
     } else if(this.state.orderType === 'limit'){
       if(this.state.quantity * this.state.bestAsk <= this.props.usdPosition.quantity){
+
         fetch(`http://localhost:3000/api/v1/orders`, {
           method: 'POST',
           headers: {

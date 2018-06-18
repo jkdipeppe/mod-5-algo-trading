@@ -4,14 +4,16 @@
 
 .App-logo {
   animation: App-logo-spin infinite 20s linear;
-  height: 40px;
+  height: 10px;
 }
 
 .App-header {
-  background-color: #222;
-  height: 100px;
-  padding: 5px;
-  color: white;
+  /* background-color: #222; */
+  background-image: url("https://thumbs.dreamstime.com/z/blockchain-digitization-blue-grey-background-hexagonal-shaped-pattern-85379808.jpg");
+  height: 70px;
+  padding: 10px;
+  color: black;
+  font-size: 25px
 }
 
 .App-title {
