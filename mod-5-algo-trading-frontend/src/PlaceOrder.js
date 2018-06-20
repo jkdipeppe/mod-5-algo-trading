@@ -24,8 +24,6 @@ class PlaceOrder extends React.Component {
             bestBid: json.bids[0][0],
             bestAsk: json.asks[0][0]
           })
-        } else {
-          null
         }
       })
     }, 1000)
@@ -109,8 +107,8 @@ class PlaceOrder extends React.Component {
       })
 
     } else if(this.state.orderType === 'limit'){
-      if(this.state.quantity * this.state.bestAsk <= this.props.usdPosition.quantity){
-
+      if((this.state.buyOrSell === 'buy' && (this.state.quantity * this.state.bestAsk <= this.props.usdPosition.quantity)) || (this.state.buyOrSell === 'sell' && this.state.quantity <= this.props.cryptoPosition.quantity)){
+        console.log('before the fetch')
         fetch(`http://localhost:3000/api/v1/orders`, {
           method: 'POST',
           headers: {
@@ -135,11 +133,12 @@ class PlaceOrder extends React.Component {
             quantity:0,
             limitPrice: 0
           })
-          console.log('the json from order placement',json)})
-        }
+          this.handleOrderSuccess()
+        }) //this goes to the if
       } else {
         this.handleOrderFail()
       }
+    }
   }
 
   handleOrderSuccess = () => {
@@ -187,10 +186,13 @@ class PlaceOrder extends React.Component {
           </Button.Group>
 
         </Form.Field>
-        <Form size={'mini'}>
-          <Form.Group>
-            <Form.Input onChange={this.handleQuantity} value={this.state.quantity} required placeholder='Quantity' width={10} />{this.props.tradingPair} Amount
-            </Form.Group>
+        <p>{this.props.tradingPair} Amount</p>
+        <Form>
+          <div style={{margin:'0 auto', width:'80%'}}>
+
+              <Form.Input onChange={this.handleQuantity} value={this.state.quantity} required placeholder='Quantity'  />
+
+          </div>
           <Form.Field>
             <Radio
               style={{padding:5}}
@@ -210,21 +212,20 @@ class PlaceOrder extends React.Component {
           </Form.Field>
         {
           this.state.orderType === 'limit' ?
-          <Form.Group>
-            <Form.Input value={this.state.limitPrice} onChange={this.handleLimitPrice} required placeholder='Price' width={10} /> Limit Price
-          </Form.Group>
-
+          <div style={{margin:'0 auto', width:'80%'}}>
+            <p>Limit Price:</p>
+            <Form.Input value={this.state.limitPrice} onChange={this.handleLimitPrice} required placeholder='Price' />
+          </div>
           : null
-
         }
         {
           this.state.buyOrSell === 'buy' ?
-          <div>
+          <div style={{margin:'0 auto', width:'80%', paddingTop:'10px'}}>
             <p>Current Best Bid is {this.state.bestBid}</p>
             <Button onClick={this.handleSubmitOrder.bind(this)} inverted color='green'>Place Buy Order {this.props.tradingPair}</Button>
           </div>
           :
-          <div>
+          <div style={{margin:'0 auto', width:'80%', paddingTop:'10px'}}>
             <p>Current Best Offer is {this.state.bestAsk}</p>
             <Button onClick={this.handleSubmitOrder.bind(this)} inverted color='red'>Place Sell Order {this.props.tradingPair}</Button>
           </div>

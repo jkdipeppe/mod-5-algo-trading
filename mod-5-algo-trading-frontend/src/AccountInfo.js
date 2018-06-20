@@ -31,8 +31,6 @@ class AccountInfo extends React.Component {
     })
       .then(resp => resp.json())
       .then(json => {
-        console.log('positions', json)
-        console.log('account id', this.props.account.id)
         json.forEach(position => {
           let symbol = position.trading_pair.substring(0,3).toLowerCase()
           this.setState({
@@ -84,8 +82,6 @@ class AccountInfo extends React.Component {
     })
       .then(resp => resp.json())
       .then(json => {
-        console.log('json for position', json)
-        console.log('account id', this.props.account.id)
         this.setState({
           usdPosition: json,
           depositBox: false
@@ -93,9 +89,6 @@ class AccountInfo extends React.Component {
       })
 
       let totalAccountDeposits = parseInt(this.state.account.cash_deposited) + parseInt(this.state.depositAmount)
-      console.log(totalAccountDeposits)
-      console.log('account ID',this.state.account.id)
-      console.log('account',this.state.account)
 
       fetch(`http://localhost:3000/api/v1/accounts/${this.state.account.id}`, {
         method: 'PATCH',
@@ -110,9 +103,9 @@ class AccountInfo extends React.Component {
         })
       })
         .then(resp => resp.json())
-        .then(json => {
-          console.log('json for updated deposited total', json)
-        })
+        // .then(json => {
+        //   console.log('json for updated deposited total', json)
+        // })
   }
 
   handleDepositAmount = (e) => {
@@ -124,28 +117,32 @@ class AccountInfo extends React.Component {
   render() {
     let cryptoPosition = this.state[`${this.props.tradingPair.substring(0,3).toLowerCase()}Position`]
     return (
-      <div>
-        <h5>Welcome: {this.props.account.username}</h5>
+      <div style={{backgroundColor:"rgba(255,255,255,0.8)", height:"100%", paddingTop:'20px'}}>
+        <h3>Welcome: {this.props.account.username}</h3>
         <h5>Available Cash (USD): {this.state.usdPosition.quantity}</h5>
         {
           this.state.depositBox ?
-          <Form onSubmit={this.handleDepositSubmit}>
-            <Input style={{align:'left', width:100}} onChange={this.handleDepositAmount} size='mini' labelPosition='right' type='text' placeholder='Amount'>
-              <Label basic>$</Label>
-              <input value={this.state.depositAmount} />
-              <Label>.00</Label>
-            </Input>
-          </Form>
+          <div style={{margin:'0 auto', width:'85%'}}>
+            <Form onSubmit={this.handleDepositSubmit}>
+              <Input onChange={this.handleDepositAmount} size='mini' labelPosition='right' type='text' placeholder='Amount'>
+                <Label basic>$</Label>
+                <input value={this.state.depositAmount} />
+                <Label>.00</Label>
+              </Input>
+            </Form>
+          </div>
           :
           <Button onClick={this.handleDeposit} size='mini'>Deposit USD</Button>
         }
-        <p>BTC: {this.state.btcPosition.quantity}</p>
+        <p style={{paddingTop:'10px'}}>BTC: {this.state.btcPosition.quantity}</p>
         <p>ETH: {this.state.ethPosition.quantity}</p>
         <p>LTC: {this.state.ltcPosition.quantity}</p>
         <p>BCH: {this.state.bchPosition.quantity}</p>
         <DropDown setTradingPair={this.props.setTradingPair}/>
         <PlaceOrder handleOrder={this.handleOrder} tradingPair={this.props.tradingPair} usdPosition={this.state.usdPosition} cryptoPosition={cryptoPosition}/>
-      </div>
+
+
+    </div>
     )
   }
 }

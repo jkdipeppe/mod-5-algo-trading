@@ -50,37 +50,29 @@ class AccountContainer extends React.Component {
   }
 
   render() {
-    if(this.state.account){
-    }
+
       return (
-        <Grid celled>
+        <Grid style={{padding:'20px'}}>
           <Grid.Row>
-            <Grid.Column width={3}>
+            <Grid.Column  style={{paddingRight:"0px"}}width={3}>
               {this.state.account ? (
                 <AccountInfo tradingPair={this.state.tradingPair} setTradingPair={this.setTradingPair} account={this.state.account}/>
               ) : (
                 <p>Loading...</p>
               )}
             </Grid.Column>
-
-            <Grid.Column width={10}>
-
-                <Segment width={8}>
+            <Grid.Column width={9} style={{padding:"0px", margin:"0px"}}>
+                <Grid.Column style={{paddingBottom:"0px"}}height={4}>
                   <LineChart tradingPair={this.state.tradingPair} chartPrices={this.state.chartPrices}/>
-
-                </Segment>
-                <Segment height={8}>
+                </Grid.Column>
+                <Grid.Column height={8} style={{paddingTop:"0px"}}>
                   <BidAsk tradingPair={this.state.tradingPair}/>
-                </Segment>
-
+                </Grid.Column>
             </Grid.Column>
-
-            <Grid.Column width={3}>
+            <Grid.Column style={{paddingLeft:"0px"}} width={4}>
               <ExecutedTrades tradingPair={this.state.tradingPair}/>
             </Grid.Column>
           </Grid.Row>
-
-
         </Grid>
       )
     }

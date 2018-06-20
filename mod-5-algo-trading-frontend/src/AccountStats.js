@@ -1,13 +1,19 @@
 import React from "react";
 import TotalReturn from "./TotalReturn";
+import AssetBreakdown from "./AssetBreakdown";
+import OpenOrders from "./OpenOrders";
+import { Tab, Grid } from 'semantic-ui-react'
 
 const baseUrl = "http://localhost:3000";
+
+
 
 class AccountStats extends React.Component {
   state = {
     account: {},
     orders: [],
     positions: [],
+
   }
 
   componentDidMount(){
@@ -23,8 +29,6 @@ class AccountStats extends React.Component {
     .then(res => res.json())
     .then(json => {
       this.setState({ account: json })
-
-
       fetch(`${baseUrl}/api/v1/orders/${json.id}`, {
         headers: new Headers({
           "Content-Type": "application/json",
@@ -35,8 +39,7 @@ class AccountStats extends React.Component {
       })
       .then(res => res.json())
       .then(json => {
-        // this.setState({ orders: json })
-        console.log('orders',json)
+        this.setState({ orders: json })
       });
       //gets positions
       fetch(`${baseUrl}/api/v1/positions/${json.id}`, {
@@ -49,8 +52,7 @@ class AccountStats extends React.Component {
       })
       .then(res => res.json())
       .then(json => {
-        // this.setState({ positions: json })
-        console.log('positions',json)
+        this.setState({ positions: json })
       });
     });
   }
@@ -58,11 +60,21 @@ class AccountStats extends React.Component {
 
 
   render() {
-    console.log(this.state.account)
+    const panes = [
+      { menuItem: 'Total Return', render: () => <TotalReturn account={this.state.account} orders={this.state.orders} positions={this.state.positions} />},
+      { menuItem: 'Assest Break Down', render: () => <AssetBreakdown account={this.state.account}/> },
+      { menuItem: 'Open Orders', render: () => <OpenOrders account={this.state.account} orders={this.state.orders}/> },
+      // { menuItem: 'Open Orders', render: () => <OpenOrders /> },
+    ]
+
     return (
-      <div>
-        Account Stats for {this.state.account.username}
-        <TotalReturn account={this.state.account} orders={this.state.orders} positions={this.state.positions} />
+      <div >
+        <Grid style={{backgroundColor:"rgba(137,173,195,0)"}}>
+          <Grid.Column width={15}>
+            <Tab menu={{ fluid: true, vertical: true, tabular: true }} panes={panes} />
+          </Grid.Column>
+          <Grid.Column width={1} />
+        </Grid>
       </div>
     )
   }

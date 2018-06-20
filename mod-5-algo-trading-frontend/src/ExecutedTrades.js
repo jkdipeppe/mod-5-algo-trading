@@ -1,4 +1,5 @@
 import React from 'react'
+import { Grid } from 'semantic-ui-react'
 
 let subscribe = JSON.stringify(
   {
@@ -31,7 +32,7 @@ class ExecutedTrades extends React.Component {
     this.state={
       trades: [],
       tradingPair: this.props.tradingPair,
-      visibleTrades: 40
+      visibleTrades: 30
     }
   }
 
@@ -39,13 +40,15 @@ class ExecutedTrades extends React.Component {
     fetch(`https://api.gdax.com/products/${this.props.tradingPair}/trades`)
      .then(resp => resp.json())
      .then(json => {
-       json.map(trade => {
-         return(
-           this.setState({
-             trades: [...this.state.trades, trade]
-           })
-         )
-       })
+       if(json){
+         json.map(trade => {
+           return(
+             this.setState({
+               trades: [...this.state.trades, trade]
+             })
+           )
+         })
+       }
        this.setState({
          trades: [...this.state.trades.splice(0,this.state.visibleTrades)]
        })
@@ -106,8 +109,14 @@ class ExecutedTrades extends React.Component {
     let arr = [...this.state.trades]
 
     return(
-      <div>
+      <div style={{backgroundColor:"rgba(255,255,255,0.8)", paddingTop:'10px', height:'100%'}}>
         <p>Executed Trades for {this.props.tradingPair}</p>
+        <Grid style={{paddingLeft:'5px'}}>
+          <Grid.Column width={1}/>
+          <Grid.Column width={4}>Price</Grid.Column>
+          <Grid.Column width={4}>Size</Grid.Column>
+          <Grid.Column width={4}>Time</Grid.Column>
+        </Grid>
         <div>
           {
             arr.map(trade => {
@@ -122,9 +131,23 @@ class ExecutedTrades extends React.Component {
                 time = hour.concat(time.split('').splice(2).join(''))
                 let color = (trade.side === 'buy') ? 'green' : 'red'
                 return(
-                  <p key={trade.trade_id} style={{fontSize: 15, color: color}}>
-                    {"S: " + size + " P: " + price + " T: " + time}
-                  </p>
+                  <Grid style={{paddingLeft:'25px', paddingBottom:'0px'}}>
+                    <Grid.Column style={{padding:'3px'}} width={5}>
+                      <p key={trade.trade_id} style={{fontSize: 15, color: color}}>
+                        {price}
+                      </p>
+                    </Grid.Column>
+                    <Grid.Column style={{padding:'3px'}} width={5}>
+                      <p key={trade.trade_id} style={{fontSize: 15}}>
+                        {size}
+                      </p>
+                    </Grid.Column>
+                    <Grid.Column style={{padding:'3px'}} width={5}>
+                      <p key={trade.trade_id} style={{fontSize: 15}}>
+                        {time}
+                      </p>
+                    </Grid.Column>
+                  </Grid>
                 )
               } else {
                 return(null)

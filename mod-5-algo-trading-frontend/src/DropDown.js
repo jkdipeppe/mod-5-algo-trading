@@ -18,9 +18,10 @@ class DropDown extends React.Component{
 
   render(){
     return(
-      <div style={{padding:'10px', width: '80%'}}>
-        <Dropdown size='mini' style={{width:'80%'}} placeholder='Select Trading Pair' search selection options={tradingPairs} onChange={this.handleTradingPair.bind(this)} />
+      <div style={{margin:'0 auto', width:'85%',paddingBottom:'10px'}}>
+        <Dropdown centered ui fluid dropdown size='mini' placeholder='Trading Pair' search selection options={tradingPairs} onChange={this.handleTradingPair.bind(this)} />
       </div>
+
     )
   }
 }

@@ -67,7 +67,7 @@ class LineChart extends React.Component{
 
   render(){
     return(
-      <div>
+      <div style={{backgroundColor:'rgba(255,255,255,0.9)', paddingTop:'10px', paddingBottom:'20px'}}>
         <Grid>
           <Grid.Column width={6}/>
           <Grid.Column  style={{textDecorationLine: 'underline'}} onClick={this.handleClick} width={2}>
@@ -88,7 +88,7 @@ class LineChart extends React.Component{
             }]
           }}
           width={100}
-          height={50}
+          height={30}
           options={
             {maintainAspectRatio: true},
             {legend: {
