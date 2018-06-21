@@ -9,7 +9,8 @@ class CreateAccount extends React.Component {
     password: '',
     firstName: '',
     lastName: '',
-    email: ''
+    email: '',
+    invalidUsernameOrEmail: false
   }
 
   handleChange = (e) => {
@@ -35,6 +36,11 @@ class CreateAccount extends React.Component {
       })
       .then(resp => resp.json())
       .then(json => {
+        if(json.id === null){
+          this.setState({
+            invalidUsernameOrEmail: true
+          })
+        }
         fetch(`${baseUrl}/login`, {
           method: "POST",
           body: JSON.stringify(this.state),
@@ -52,13 +58,18 @@ class CreateAccount extends React.Component {
             }
           })
       })
+    } else {
+      this.setState({
+        invalidUsernameOrEmail: true
+      })
+      //display invalid login
     }
   }
 
   render(){
-
+    console.log(this.state.invalidUsernameOrEmail)
     return(
-      <Grid>
+      <Grid style={{margin:'20px', padding:'10px', backgroundColor:'rgba(255,255,255,0.4)'}}>
         <Grid.Row>
           <Grid.Column width= {5}/>
           <Grid.Column width={6}>
@@ -91,6 +102,12 @@ class CreateAccount extends React.Component {
         </Grid.Column>
         <Grid.Column width= {5}/>
         </Grid.Row>
+        {
+          this.state.invalidUsernameOrEmail ?
+          <p style={{padding:'5px', margin:'0 auto', color:'red', backgroundColor:'rgba(255,255,255,0)'}}>The username or password is already taken or the form in incomplete.</p>
+          :
+          null
+        }
       </Grid>
     )
   }

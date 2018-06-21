@@ -110,33 +110,32 @@ class TotalReturn extends React.Component {
 
     ]
     return (
-      <div style={{padding:'10px'}} >
-        <br/>
+      <div style={{padding:'30px', backgroundColor:'rgba(255,255,255,0.4)', height:'100%'}} >
         <Card.Group centered items={oneItem} />
         <h2>Positions:</h2>
         <Card.Group centered>
           <Card
             style={{backgroundColor: "rgba(255,255,255,0.7)"}}
-            header= {`BTC - $${this.state.BTC}`}
-            description= {`Current Position Value (USD): $${btcValue.toFixed(2)}`}
+            header= {`BTC - $${btcValue.toFixed(2)}`}
+            description= {`Current Price (USD): $${this.state.BTC}`}
             meta= {`Qty: ${this.state.btcPosition.quantity}`}
           />
           <Card
             style={{backgroundColor: "rgba(255,255,255,0.7)"}}
-            header= {`BCH - $${this.state.BCH}`}
+            header= {`BCH - $${bchValue.toFixed(2)}`}
             meta= {`Qty: ${this.state.bchPosition.quantity}`}
-            description= {`Current Position Value (USD): $${bchValue.toFixed(2)}`}
+            description= {`Current Price (USD): $${this.state.BCH}`}
           />
           <Card
             style={{backgroundColor: "rgba(255, 255, 255, 0.7)"}}
-            header= {`ETH - $${this.state.ETH}`}
-            description= {`Current Position Value (USD): $${ethValue.toFixed(2)}`}
+            header= {`ETH - $${ethValue.toFixed(2)}`}
+            description= {`Current Price (USD): $${this.state.ETH}`}
             meta= {`Qty: ${this.state.ethPosition.quantity}`}
           />
           <Card
             style={{backgroundColor: "rgba(255,255,255,0.7)"}}
-            header= {`LTC - $${this.state.LTC}`}
-            description= {`Current Position Value (USD): $${ltcValue.toFixed(2)}`}
+            header= {`LTC - $${ltcValue.toFixed(2)}`}
+            description= {`Current Price (USD): $${this.state.LTC}`}
             meta= {`Qty: ${this.state.ltcPosition.quantity}`}
           />
           <Card

@@ -68,13 +68,10 @@ class AccountStats extends React.Component {
     ]
 
     return (
-      <div >
-        <Grid style={{backgroundColor:"rgba(137,173,195,0)"}}>
-          <Grid.Column width={15}>
-            <Tab menu={{ fluid: true, vertical: true, tabular: true }} panes={panes} />
-          </Grid.Column>
-          <Grid.Column width={1} />
-        </Grid>
+      <div style={{margin:'20px', backgroundColor:'rgba(255,255,255,0)'}}>
+        <TotalReturn account={this.state.account} orders={this.state.orders} positions={this.state.positions} />
+        <AssetBreakdown account={this.state.account}/>
+      
       </div>
     )
   }

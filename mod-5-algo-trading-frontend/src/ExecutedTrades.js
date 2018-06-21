@@ -32,7 +32,7 @@ class ExecutedTrades extends React.Component {
     this.state={
       trades: [],
       tradingPair: this.props.tradingPair,
-      visibleTrades: 30
+      visibleTrades: 40
     }
   }
 
@@ -40,7 +40,8 @@ class ExecutedTrades extends React.Component {
     fetch(`https://api.gdax.com/products/${this.props.tradingPair}/trades`)
      .then(resp => resp.json())
      .then(json => {
-       if(json){
+       if(json.length){
+         console.log('hopeitdoesntfail', json)
          json.map(trade => {
            return(
              this.setState({
@@ -48,6 +49,8 @@ class ExecutedTrades extends React.Component {
              })
            )
          })
+       } else {
+         console.log('fetch failed for executed trades')
        }
        this.setState({
          trades: [...this.state.trades.splice(0,this.state.visibleTrades)]
@@ -90,7 +93,9 @@ class ExecutedTrades extends React.Component {
       fetch(`https://api.gdax.com/products/${this.props.tradingPair}/trades`)
        .then(resp => resp.json())
        .then(json => {
-         if(json){
+         if(json.length){
+           console.log('might fail here', json)
+           console.log('might fail here-length', json.length)
          json.map(trade => {
            return(
              this.setState({
@@ -101,7 +106,10 @@ class ExecutedTrades extends React.Component {
          this.setState({
            trades: [...this.state.trades.splice(0,this.state.visibleTrades)]
          })
-       }})
+       } else {
+         console.log('fetch failed for executed trades')
+       }
+     })
     }
   }
 

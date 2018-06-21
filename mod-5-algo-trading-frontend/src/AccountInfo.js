@@ -15,7 +15,7 @@ class AccountInfo extends React.Component {
       bchPosition: {},
       ltcPosition: {},
       depositBox: false,
-      depositAmount: 0
+      depositAmount: null
     }
   }
 
@@ -67,6 +67,9 @@ class AccountInfo extends React.Component {
   }
 
   handleDepositSubmit = (e) => {
+    this.setState({
+      depositAmount: null
+    })
     let totalCash = parseInt(this.state.depositAmount) + parseInt(this.state.usdPosition.quantity)
     fetch(`http://localhost:3000/api/v1/positions/${this.state.usdPosition.id}`, {
       method: 'PATCH',
@@ -123,12 +126,8 @@ class AccountInfo extends React.Component {
         {
           this.state.depositBox ?
           <div style={{margin:'0 auto', width:'85%'}}>
-            <Form onSubmit={this.handleDepositSubmit}>
-              <Input onChange={this.handleDepositAmount} size='mini' labelPosition='right' type='text' placeholder='Amount'>
-                <Label basic>$</Label>
-                <input value={this.state.depositAmount} />
-                <Label>.00</Label>
-              </Input>
+            <Form style={{margin:'0 auto', width:'85%'}} onSubmit={this.handleDepositSubmit}>
+              <Input onChange={this.handleDepositAmount} size='mini' type='text' placeholder='$0.00' value={this.state.depositAmount} />
             </Form>
           </div>
           :

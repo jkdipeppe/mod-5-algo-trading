@@ -20,7 +20,7 @@ class AssetBreakdown extends React.Component {
     BCH: 0,
     ETH: 0,
     LTC: 0,
-    colors: ['rgba(200, 100, 50, 10)', 'rgba(150, 50, 100, 40)', 'rgba(100, 75, 125, 100)', 'rgba(250, 200, 200, 175)', 'rgba(0, 0, 0, 0.1)']
+    colors: ['rgb(200, 100, 50)', 'rgb(150, 50, 100)', 'rgb(100, 75, 125)', 'rgb(250, 200, 200)', 'rgba(0, 0, 0)']
   }
 
   componentDidMount(){
@@ -73,11 +73,12 @@ class AssetBreakdown extends React.Component {
             datasets: [{
               label: `Asset Breakdown`,
               data: [this.state.usdPosition.quantity, (this.state.BTC * parseFloat(this.state.btcPosition.quantity)), (this.state.BCH * parseFloat(this.state.bchPosition.quantity)), (this.state.LTC * parseFloat(this.state.ltcPosition.quantity)), (this.state.ETH * parseFloat(this.state.ethPosition.quantity))],
-              backgroundColor: this.state.colors
+              backgroundColor: this.state.colors,
+              borderColor: this.state.colors
             }]
           }}
           width={100}
-          height={50}
+          height={30}
           options={
             {maintainAspectRatio: true},
             {legend: {

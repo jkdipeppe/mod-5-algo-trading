@@ -1,4 +1,5 @@
 import React from "react";
+import { Form, Button } from "semantic-ui-react"
 
 
 const baseUrl = "http://localhost:3000";
@@ -6,7 +7,8 @@ const baseUrl = "http://localhost:3000";
 class Login extends React.Component {
   state = {
     username: "",
-    password: ""
+    password: "",
+    invalid: false
   };
 
   login = e => {
@@ -26,6 +28,10 @@ class Login extends React.Component {
         if(json.token) {
           localStorage.setItem("token", json.token);
           this.props.handleLogIn()
+        } else {
+          this.setState({
+            invalid: true
+          })
         }
         this.props.handleRoute()
       })
@@ -35,7 +41,7 @@ class Login extends React.Component {
 
     return (
       <div>
-        <form>
+        <Form centered style={{margin:'0 auto', width:'200px', padding:'5px'}}>
           <input
             name="username"
             value={this.state.username}
@@ -48,8 +54,14 @@ class Login extends React.Component {
             onChange={e => this.setState({ password: e.target.value })}
             placeholder="password"
           />
-        <button onClick={this.login.bind(this)}>Login</button>
-        </form>
+        <Button style={{backgroundColor:'gray', padding:'10px', margin:'10px'}} onClick={this.login.bind(this)}>Login</Button>
+        </Form>
+      {
+        this.state.invalid ?
+        <p style={{textColor:'red'}}>Incorrect Username or Password</p>
+        :
+        null
+      }
       </div>
     );
   }

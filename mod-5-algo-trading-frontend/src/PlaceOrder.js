@@ -138,6 +138,8 @@ class PlaceOrder extends React.Component {
       } else {
         this.handleOrderFail()
       }
+    } else {
+      this.handleOrderFail()
     }
   }
 

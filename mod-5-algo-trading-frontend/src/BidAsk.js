@@ -35,7 +35,7 @@ class BidAsk extends React.Component {
     let key = 1;
 
     return (
-      <div style={{backgroundColor:"rgba(255,255,255,0.9)"}}>
+      <div style={{padding:'20px', backgroundColor:"rgba(255,255,255,0.9)"}}>
       <Grid columns={2} divided>
           <Grid.Column width={8}>
             <h3>Bid</h3>
