@@ -84,7 +84,7 @@ class AssetBreakdown extends React.Component {
             {legend: {
              display: true,
              labels: {
-               boxWidth: 0,
+               boxWidth: 5,
                fontColor: "rgb(0, 0, 0)"
              }
            }}
